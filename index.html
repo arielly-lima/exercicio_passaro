@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <title>Exercício do Pássaro</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+
+// Configuração do jogo
+var config = {
+    // O Phaser escolhe automaticamente entre webGL e Canvas
+    type: Phaser.AUTO,
+    // Largura da tela do jogo
+    width: 800,
+    // Altura da tela do jogo
+    height: 600,
+
+    // Definição das funções principais do jogo
+    scene: {
+        // Carrega os arquivos antes do jogo começar
+        preload: preload,
+        // Configura os elementos na tela
+        create: create,
+        // Atualiza continuarmente os elementos do jogo
+        update: update
+    }
+};
+
+// Criando o jogo com as configurações definidas
+var game = new Phaser.Game(config);
+
+// Variável passarinho, que guarda o pássaro que inserimos na tela
+var passarinho;
+ 
+// Função que carrega os arquivos antes do jogo começar
+function preload() {
+    // Imagem de fundo
+    this.load.image('bg', 'assets/bg_space.png');
+    // Spritesheet do pássaro
+    this.load.spritesheet('bird', 'assets/bird-purple.png', {frameWidth: 75, frameHeight:74});
+}
+
+// Função que adiciona os elementos na tela quando o jogo começa
+function create() {
+    // Posição e redimensionamento da tela de fundo
+    this.add.image(400, 300, 'bg').setScale(1.2);
+    // Posição e redimensionamento do pássaro
+    passarinho = this.add.sprite(400, 300, 'bird').setScale(1.3);
+
+    // Criação de uma animação para a spritesheet
+    this.anims.create({ 
+        // Nome da animação
+        key: 'fly',
+        // Definição dos frames da animação e indica que a animação usará os frames de 0 a 7
+        frames: this.anims.generateFrameNumbers('bird', { start:0, end: 7}),
+        // Velocidade da animação (10 quadrados por segundo)
+        frameRate: 10,
+        // Faz a animação se repetir infinitamente
+        repeat: -1
+    });
+    // Animação de "fly", que foi criada anteriormente, caso "ida" seja "true", o pássaro começa a descer
+    passarinho.anims.play('fly', true);
+    passarinho.ida = true;
+}
+
+// Função que roda constantemente para atualizar o jogo (podemos adicionar movimentos ou interações)
+function update() {
+    // cria um loop for que executa 3 vezes a cada ciclo do update
+    for (let i = 0; i < 3; i++) {
+        // Se passarinho.volta é true, o passarinho se move para a direita
+        if (passarinho.volta) {
+            passarinho.x += 1;
+        } else {
+            // Se for falso, o passarinho se move para a esquerda
+            passarinho.x -= 1;
+        }
+    }
+    // Verifica se o passarinho atingiu a posição máxima no eixo X (direita)
+    if (passarinho.x >= 780) {
+         // Inverte a imagem horizontalmente para dar a impressão de que ele está voltando
+        passarinho.setFlip(true, false);
+        // Define a variável 'volta' como 'false', indicando que agora ele deve se mover para a esquerda
+        passarinho.volta = false;
+    } 
+    
+    // Caso contrário, verifica se o passarinho atingiu a posição mínima no eixo X (esquerda)
+    else if (passarinho.x <= 50) {
+        // Reverte a imagem para a posição normal, mostrando que ele está indo para a direita
+        passarinho.setFlip(false, false);
+        // Define 'volta' como 'true', indicando que agora ele deve se mover para a direita
+        passarinho.volta = true;
+    }
+    
+    // Variável para o movimento vertical contínuo
+    let contador = 0;
+    // Loop 'while' que será executado enquanto 'contador' for menor que 1
+    while (contador < 1) {
+        // Caso a variável 'passarinho.descendo' for verdadeira, o passarinho se move para cima
+        if (passarinho.descendo) {
+            passarinho.y -= 1;
+        } 
+        else {
+            // Se for falsa, move o passarinho para baixo (soma 1 no eixo y)
+            passarinho.y += 1;
+        }
+        // Incrementa o contador para que o loop pare após uma única execução
+        contador++;
+    }
+    // Verifica se o passarinho atingiu o limite superior da tela (y <= 20)
+    if (passarinho.y <= 20) {
+         // Se sim, define 'descendo' como 'false', indicando que ele deve se mover para baixo
+        passarinho.descendo = false;
+        // Caso contrário, verifica se o passarinho atingiu o limite inferior da tela (y >= 580), se sim, ele deve se mover para cima
+    } else if (passarinho.y >= 580) {
+        passarinho.descendo = true;
+    }
+    // Se a posição do pássaro no eixo y for exatamente 100, ele deve começar a descer
+    if (passarinho.y === 100) {
+        passarinho.ida = true;
+    }
+    // Verifica se a posição y do passarinho é menor que 600 e "ida" é verdadeiro, move o passarinho para baixo
+    if (passarinho.y < 600 && passarinho.ida === true) {
+        passarinho.y += 5;
+    }
+    // Se a posição y do passarinho for exatamente 600, define "ida" como false e o passarinho começa a subir 
+    if (passarinho.y === 600) {
+        passarinho.ida = false;
+    }
+    // Se a posição y do passarinho for maior que 100, e "ida" é false, move o passarinho para cima
+    if (passarinho.y > 100 && passarinho.ida === false) {
+        passarinho.y -= 5;
+    }
+}
+
+
+</script>
+
+</body>
+</html>
+
+
